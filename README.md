@@ -1,10 +1,10 @@
 # moodmusic_rumad
 
-A new Flutter project.
+A  Flutter project by Jayden Shah and Aarav Purohit.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a starting point for a Flutter application. We use the spotify API to take in user inpute on song genre, artist, and produce an output of reccomended songs. Following this, you can add songs to a liked songs section. You can also create an empty playlist that directly links to your spotify account.
 
 A few resources to get you started if this is your first Flutter project:
 
