@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moodmusic_rumad/screens/add.dart';
 import 'package:moodmusic_rumad/screens/home.dart';
-import 'package:moodmusic_rumad/screens/library.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 class MyApp extends StatefulWidget {
@@ -12,7 +11,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-final Tabs = [const Home(), const Add(), const Library()];
+final Tabs = [const Home(), const Add()];
 int currentTabIndex = 0;
 
 @override

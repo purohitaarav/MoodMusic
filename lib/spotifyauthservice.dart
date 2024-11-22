@@ -34,11 +34,11 @@ class _AuthScreenState extends State<AuthScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SupaSocialsAuth(
-                socialProviders: [
+                socialProviders: const [
                   OAuthProvider.spotify,
                 ],
                 onSuccess: finishSigning,
-                scopes: {
+                scopes: const {
                   OAuthProvider.spotify:
                       "user-read-email user-read-private user-library-modify user-library-read playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public"
                 },
