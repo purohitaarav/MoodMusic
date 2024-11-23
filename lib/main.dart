@@ -20,7 +20,7 @@ Future<void> main() async {
     debugShowCheckedModeBanner: false,
     home: const AuthScreen(),
     routes: {
-        '/auth': (context) => const AuthScreen(),
-      },
+      '/auth': (context) => const AuthScreen(),
+    },
   ));
 }
