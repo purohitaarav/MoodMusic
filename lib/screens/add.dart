@@ -4,7 +4,9 @@ import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 import 'dart:convert';
 
 class Add extends StatefulWidget {
-  const Add({super.key});
+  final Function(Map<String, dynamic>) onPlaylistCreated;
+
+  const Add({super.key, required this.onPlaylistCreated});
 
   @override
   State<Add> createState() => _AddPlaylistState();
@@ -15,9 +17,6 @@ class _AddPlaylistState extends State<Add> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _imageUrlController = TextEditingController();
-
-  List<Map<String, dynamic>> createdPlaylists =
-      []; // List to store created playlists
 
   @override
   void dispose() {
@@ -32,13 +31,12 @@ class _AddPlaylistState extends State<Add> {
       try {
         final session = Supabase.instance.client.auth.currentSession;
         if (session?.providerToken == null) {
-          debugPrint("No provider token found.");
+          debugPrint("No Spotify provider token found.");
           return;
         }
 
         final bearerToken = "Bearer ${session!.providerToken}";
 
-        // Construct the request body
         final body = {
           "name": _nameController.text,
           "description": _descriptionController.text,
@@ -58,24 +56,17 @@ class _AddPlaylistState extends State<Add> {
         if (response.statusCode == 201) {
           debugPrint("Playlist created successfully!");
 
-          // Decode the response to get playlist data
           final playlistData = json.decode(response.body);
 
-          // If image URL is provided, upload the image for the playlist
-          if (_imageUrlController.text.isNotEmpty) {
-            await addImageToPlaylist(playlistData['id']);
-          }
-
-          // Add the playlist to the list of created playlists
-          setState(() {
-            createdPlaylists.add({
-              'name': playlistData['name'],
-              'description': playlistData['description'],
-              'imageUrl': _imageUrlController.text,
-            });
+          widget.onPlaylistCreated({
+            'id': playlistData['id'], // Spotify playlist ID for deletion
+            'name': playlistData['name'],
+            'description': playlistData['description'],
+            'imageUrl': _imageUrlController.text.isNotEmpty
+                ? _imageUrlController.text
+                : '',
           });
 
-          // Clear the form fields after creation
           _nameController.clear();
           _descriptionController.clear();
           _imageUrlController.clear();
@@ -94,51 +85,12 @@ class _AddPlaylistState extends State<Add> {
     }
   }
 
-  Future<void> addImageToPlaylist(String playlistId) async {
-    try {
-      final session = Supabase.instance.client.auth.currentSession;
-      if (session?.providerToken == null) {
-        debugPrint("No provider token found.");
-        return;
-      }
-
-      final bearerToken = "Bearer ${session!.providerToken}";
-
-      // Fetch the image from the provided URL
-      final imageResponse = await http.get(Uri.parse(_imageUrlController.text));
-      if (imageResponse.statusCode == 200) {
-        final base64Image = base64Encode(imageResponse.bodyBytes);
-
-        // Upload the base64-encoded image to the playlist
-        final uploadResponse = await http.put(
-          Uri.parse("https://api.spotify.com/v1/playlists/$playlistId/images"),
-          headers: {
-            "Authorization": bearerToken,
-            "Content-Type": "image/jpeg",
-          },
-          body: base64Decode(base64Image),
-        );
-
-        if (uploadResponse.statusCode == 202) {
-          debugPrint("Playlist image added successfully!");
-        } else {
-          debugPrint(
-              "Error adding image: Status Code ${uploadResponse.statusCode}");
-        }
-      } else {
-        debugPrint(
-            "Error fetching image from URL: ${imageResponse.statusCode}");
-      }
-    } catch (error) {
-      debugPrint("Error in addImageToPlaylist: $error");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add New Playlist"),
+        title: const Text("Add New Playlist", style: TextStyle(color: Colors.white,)),
+        backgroundColor: Colors.black,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -183,28 +135,6 @@ class _AddPlaylistState extends State<Add> {
                     child: const Text("Create Playlist"),
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 32.0),
-            // Display list of created playlists
-            Expanded(
-              child: ListView.builder(
-                itemCount: createdPlaylists.length,
-                itemBuilder: (context, index) {
-                  final playlist = createdPlaylists[index];
-                  return ListTile(
-                    leading: playlist['imageUrl'].isNotEmpty
-                        ? Image.network(
-                            playlist['imageUrl'],
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          )
-                        : const Icon(Icons.music_note),
-                    title: Text(playlist['name']),
-                    subtitle: Text(playlist['description']),
-                  );
-                },
               ),
             ),
           ],

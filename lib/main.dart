@@ -4,7 +4,7 @@ import 'package:moodmusic_rumad/spotifyauthservice.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Do this immediately as well.
+  WidgetsFlutterBinding.ensureInitialized(); 
 
   await Supabase.initialize(
     authOptions: const FlutterAuthClientOptions(
